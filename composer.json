@@ -14,5 +14,10 @@
   ],
   "require": {
     "bower-asset/paulosales-w2ui": "1.5.0"
-  }
+  },
+  "autoload": {
+        "psr-4": {
+            "paulosales\\w2ui": ""
+        }
+    }
 }
