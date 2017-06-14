@@ -1,6 +1,6 @@
 <?php
 
-namespace paulosales\extensions\assets;
+namespace paulosales\w2ui\assets;
 
 use yii\web\AssetBundle;
 
