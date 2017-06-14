@@ -1,0 +1,18 @@
+{
+  "name": "paulosales/yii2-w2ui",
+  "description": "yii2 extention (wrapper for w2ui library)",
+  "type": "yii2-extension",
+  "keywords": ["yii2", "w2ui", "extension", "ui"],
+  "homepage": "https://github.com/paulosales/yii2-w2ui",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Paulo Rogério Sales Santos",
+      "email": "paulosales@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "bower-asset/paulosales-w2ui": "1.5.0"
+  }
+}
