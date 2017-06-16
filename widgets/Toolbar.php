@@ -75,7 +75,10 @@ class Toolbar extends Widget
         $view->registerJs("jQuery(function() {
             jQuery('#$this->id').w2toolbar({
                 name: '$this->name',
-                items: " . $this->renderItems($items) . "
+                items: " . $this->renderItems($items) . ",
+                onClick: function (e) {
+                    console.log('teste');
+                }
             });
         });");
     }
@@ -93,10 +96,16 @@ class Toolbar extends Widget
         if(isset($item['icon'])) {
             $jsonItem .= ", icon: '" . $item['icon'] . "'";
         }
+        if(isset($item['type'])) {
+            $jsonItem .= ", type: '" . $item['type'] . "'";
+        }
         if(isset($item['url'])) {
             $jsonItem .= ", onClick: function(e) {
                 window.location = '" . Html::encode(Url::to($item['url'])) . "'
             }";
+        }
+        if(isset($item['items'])) {
+            $jsonItem .= ", items: " . $this->renderItems($item['items']);  
         }
         $jsonItem .= "}";
         return $jsonItem;
