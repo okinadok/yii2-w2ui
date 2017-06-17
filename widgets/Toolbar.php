@@ -23,6 +23,10 @@ class Toolbar extends Widget
 
     public $name = null;
 
+    public $tooltip = 'top|left';
+
+    public $fixed = true;
+
     private $id = null;
 
     /**
@@ -66,32 +70,43 @@ class Toolbar extends Widget
         $this->id = $options['id'];
         
         if(!isset($options['style'])) {
-            $options['style'] = 'padding: 4px; border: 1px solid #dfdfdf; border-radius: 3px';
+            $options['style'] = ($this->fixed?'position: fixed; right: 0; left: 0; ':'') . 'padding: 4px; border: 1px solid #dfdfdf; border-radius: 3px';
         }
         echo Html::tag('div', '', $options);
 
         $view = $this->getView();
         $items = $this->normalizeItems($this->items, $hasActiveChild);
-        $view->registerJs("jQuery(function() {
-            jQuery('#$this->id').w2toolbar({
-                name: '$this->name',
-                items: " . $this->renderItems($items) . ",
-                onClick: function (e) {
-                    console.log('teste');
-                }
-            });
-        });");
+        $view->registerJs(
+"jQuery(function() {
+    jQuery('#$this->id').w2toolbar({
+        name: '$this->name',
+        tooltip: '$this->tooltip',
+        items: " . $this->renderItems($items) . ",
+        onClick: function(e) {
+            if(e.subItem && e.subItem.url) {
+                window.location = e.subItem.url;
+            }
+            else if(e.item && e.item.url) {
+                window.location = e.item.url;
+            }
+        }
+    });
+});");
     }
 
-    protected function renderItems($items) {
+    protected function renderItems($items, $level = 0) {
         $itemsArray = [];
         foreach($items as $i => $item) {
-            $itemsArray[] = $this->renderItem($item);
+            $itemsArray[] = $this->renderItem($item, $level);
         }
-        return '[' . implode(",\r\n", $itemsArray) . ']';
+        $ident = "";
+        $identClose = "";
+        $ident = str_pad($ident, 12+4*$level, " ");
+        $identClose = str_pad($identClose, 8+4*$level, " ");
+        return "[\r\n$ident" . implode(",\r\n$ident", $itemsArray) . "\r\n$identClose]";
     }
 
-    protected function renderItem($item) {
+    protected function renderItem($item, $level) {
         $jsonItem = "{text: '" . $item['label'] . "'";
         if(isset($item['icon'])) {
             $jsonItem .= ", icon: '" . $item['icon'] . "'";
@@ -100,12 +115,25 @@ class Toolbar extends Widget
             $jsonItem .= ", type: '" . $item['type'] . "'";
         }
         if(isset($item['url'])) {
-            $jsonItem .= ", onClick: function(e) {
-                window.location = '" . Html::encode(Url::to($item['url'])) . "'
-            }";
+            $jsonItem .= ", url: '" . Html::encode(Url::to($item['url'])) . "'";
         }
         if(isset($item['items'])) {
-            $jsonItem .= ", items: " . $this->renderItems($item['items']);  
+            $jsonItem .= ", items: " . $this->renderItems($item['items'], $level+1);
+        }
+        if(isset($item['tooltip'])) {
+            $jsonItem .= ", tooltip: '" . $item['tooltip'] . "'";
+        }
+        if(isset($item['count'])) {
+            $jsonItem .= ", count: " . $item['count'];
+        }
+        if(isset($item['hidden'])) {
+            $jsonItem .= ", hidden: " . ($item['hidden']?'true':'false');
+        }
+        if(isset($item['disabled'])) {
+            $jsonItem .= ", disabled: " . ($item['disabled']?'true':'false');
+        }
+        if(isset($item['checked'])) {
+            $jsonItem .= ", checked: " . ($item['checked']?'true':'false');
         }
         $jsonItem .= "}";
         return $jsonItem;
